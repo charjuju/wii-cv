@@ -66,6 +66,40 @@ const FormattedDate = () => {
 };
 
 export default function BarBottom() {
+    const [pingText, setPingText] = useState('');
+
+    const showPingText = (message) => {
+        setPingText(message);
+
+        setTimeout(() => {
+            setPingText('');
+        }, 1000);
+    };
+
+    const copyMailToClipboard = () => {
+        const textToCopy = 'marzat.jude3@gmail.com';
+      
+        // Créer un élément textarea temporaire
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+      
+        // Rendre le textarea invisible
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+      
+        document.body.appendChild(textarea);
+      
+        // Sélectionner et copier le texte dans le presse-papiers
+        textarea.select();
+        document.execCommand('copy');
+      
+        // Nettoyer et retirer le textarea
+        document.body.removeChild(textarea);
+      
+        // Afficher un message ou déclencher une animation par exemple
+        console.log('Adresse e-mail copiée :', textToCopy);
+      };
+
     return (
         <div style={{ position: 'fixed', bottom: '0px', width: '100vw' }}>
             <div style={{ position: 'absolute', width: '100%', top: '30px' }}>
@@ -76,7 +110,12 @@ export default function BarBottom() {
             </div>
             <img alt='bot bottom' style={{ width: '100%', zIndex: '1' }} src='/botBat.png' />
             <img alt='Wii button' style={{ width: '9.6%', position: 'absolute', left: '5.5%', top: '12%', zIndex: '2', filter: 'drop-shadow(10px 20px 1px rgba(0, 0, 0, 0.2))' }} src='/wiiButton.png' />
-            <img alt='mail button' style={{ width: '9.6%', position: 'absolute', right: '5.5%', top: '12%', zIndex: '2', filter: 'drop-shadow(10px 20px 1px rgba(0, 0, 0, 0.2))' }} src='/mail.png' />
+            <img onClick={() => {showPingText('Mail copié dans le presse-papiers'); copyMailToClipboard()}} alt='mail button' style={{ width: '9.6%', position: 'absolute', right: '5.5%', top: '12%', zIndex: '2', filter: 'drop-shadow(10px 20px 1px rgba(0, 0, 0, 0.2))' }} src='/mail.png' />
+            {pingText && (
+                <div className="ping-text">
+                    {pingText}
+                </div>
+            )}
         </div>
 
     )

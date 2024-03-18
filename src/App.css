@@ -37,6 +37,8 @@
 }
 
 .all-tv-conteneur {
+  width: 90vw;
+  overflow: hidden;
   padding-top: 10vh;
   display: flex;
   flex-direction: column;
@@ -120,5 +122,31 @@
   }
   100% {
     background-color: transparent;
+  }
+}
+
+.ping-text {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  animation: fade-in-out 1s ease-in-out forwards;
+}
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
