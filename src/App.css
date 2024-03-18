@@ -101,3 +101,24 @@
 .classic-back {
   background-image: url('./wii-ico/background.png');
 }
+
+@keyframes blinkingText {
+  0% {
+    color: white;
+  }
+  50% {
+    color: transparent;
+  }
+  100% {
+    color: white;
+  }
+}
+
+@keyframes black-to-invisible {
+  0% {
+    background-color: black;
+  }
+  100% {
+    background-color: transparent;
+  }
+}

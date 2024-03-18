@@ -29,10 +29,10 @@ export default function WiiTv({ info, updateTvTabInfo }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         updateTvTabInfo(info.index, {
-            nom: 'unknown',
-            url: 'unknown',
-            imgFond: 'tools.png',
-            imgCover: 'tools.png',
+            nom: nom,
+            url: url,
+            imgFond: imgFond,
+            imgCover: imgCover,
         })
         setNom('');
         setUrl('');
@@ -40,7 +40,7 @@ export default function WiiTv({ info, updateTvTabInfo }) {
         setImgCover('');
     }
     return (
-        <div onClick={!showSquare ? getDivPosition : console.log("ok")} className='tv-noise' ref={tvRef}>
+        <div onClick={!showSquare ? getDivPosition : console.log("ok")} style={{backgroundImage: `url(${info.res.imgCover})`}} className='tv-noise' ref={tvRef}>
             {showSquare && <div className="go-black" />}
             {showSquare && (
                 <motion.div
