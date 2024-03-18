@@ -129,10 +129,12 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: rgba(0, 0, 0, 0.8);
+  border: 3px solid #69c5e2;
+  background-color: #e3e3e3;
   color: white;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 50px;
+  font-size: 30px;
+  border-radius: 24px;
   animation: fade-in-out 1s ease-in-out forwards;
 }
 
