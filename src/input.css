@@ -1,0 +1,20 @@
+.input {
+    cursor: url('./wii-cursor-by-stefano-tinaglia/wii-pointer-reverse.cur'), auto;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+}
+
+.input:focus {
+    cursor: url('./wii-cursor-by-stefano-tinaglia/wii-pointer-reverse.cur'), auto;
+    border-color: #4c4c4c;
+    outline: none;
+}
+
+.input:disabled {
+    cursor: url('./wii-cursor-by-stefano-tinaglia/wii-pointer-reverse.cur'), auto;
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}

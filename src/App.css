@@ -1,38 +1,103 @@
 .App {
-  text-align: center;
+  cursor: url('./wii-cursor-by-stefano-tinaglia/Wii Cursor.cur'), auto;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('./wii-ico/background.png');
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.tv-noise {
+  background-image: url('./wii-ico/wii-channel-static-empty-wii-channel.gif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  border-radius: 10%;
+  border: 5px solid #c2c3b9;
+  width: 18vw;
+  height: 17vh;
+  transition: all 0.2s ease;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.tv-noise:hover {
+  background-image: url('./wii-ico/wii-channel-static-empty-wii-channel.gif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  border-radius: 10%;
+  border: 5px solid #69c5e2;
+  width: 18vw;
+  height: 17vh;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.all-tv-conteneur {
+  padding-top: 10vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  height: 60vh;
+  padding-left: 10vw;
+  gap: 3% 1%;
+}
+
+@font-face {
+  font-family: 'Digital-7';
+  src: url('./font/digital-7/digital-7.ttf') format('opentype');
+}
+
+.digital-clock-time {
+  font-family: 'Digital-7', sans-serif;
+  font-size: 70px;
+  margin: 0px;
+  color: gray;
+}
+
+.black-square {
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 24%;
+  background-color: white;
+  z-index: 999;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
   color: white;
+  font-size: 24px;
 }
 
-.App-link {
-  color: #61dafb;
+.black-square button:hover {
+  background-color: #555;
 }
 
-@keyframes App-logo-spin {
+@keyframes fadeToBlack {
   from {
-    transform: rotate(0deg);
+    background-color: transparent;
   }
   to {
-    transform: rotate(360deg);
+    background-color: black;
   }
+}
+
+.go-black {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  z-index: 999;
+  animation: fadeToBlack 1s forwards;
+  animation-play-state: running;
+}
+
+.classic-back {
+  background-image: url('./wii-ico/background.png');
 }
