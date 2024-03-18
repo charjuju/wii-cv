@@ -9,7 +9,8 @@ function App() {
       <div>
         <div className="container">
           <Routes>
-            <Route path="/" element={<WiiMenu />} />
+          <Route path="/" element={<WiiMenu />} />
+          <Route path="/home" element={<WiiMenu />} />
           </Routes>
         </div>
       </div>
