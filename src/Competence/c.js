@@ -1,7 +1,6 @@
 export default function LangageC() {
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', width: '100%', flexWrap: 'wrap', alignItems: 'center' }}>
-
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%', flexWrap: 'wrap', alignItems: 'center', animation: 'Apparition 2s forwards'}}>
             <h1 style={{ fontSize: '100px', textAlign: 'center', width: '100%' }}>Langage C</h1>
 
             <div style={{ display: 'flex', width: '80%', justifyContent: 'space-around' }}>
@@ -26,7 +25,7 @@ export default function LangageC() {
                     <p style={{ fontSize: '40px', marginLeft: '60px' }}>Il est largement utilisé dans le développement de systèmes d'exploitation, de logiciels embarqués, de pilotes de périphériques et bien plus encore. Sa syntaxe est connue pour être concise et puissante, ce qui en fait un choix populaire pour les programmeurs souhaitant travailler au niveau système.</p>
                 </div>
                 <div style={{
-                    backgroundImage: `url('https://bs-uploads.toptal.io/blackfish-uploads/components/blog_post_page/content/cover_image_file/cover_image/1309974/retina_500x200_cover-0828_AfterAllTheseYearstheWorldisStillPoweredbyCProgramming_Razvan_Newsletter-2b9ea38294bb08c5aea1f0c1cb06732f.png')`,
+                    backgroundImage: `url('https://i.redd.it/nmuax05zxoab1.gif')`,
                     backgroundSize: 'cover',
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
