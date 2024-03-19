@@ -92,7 +92,13 @@ function App() {
         imgCover: 'wii-channel-static-empty-wii-channel.gif',
       });
     }
-    wiiTvInfo[0].imgCover = "regard.jpg"
+    wiiTvInfo[0] = {
+      relative: true,
+      nom: 'Gmail',
+      url: 'Compétence',
+      imgFond: "regard.jpg",
+      imgCover: "regard.jpg",
+    }
     wiiTvInfo[1] = {
       relative: false,
       nom: 'Gmail',
