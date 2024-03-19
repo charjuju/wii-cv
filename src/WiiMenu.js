@@ -14,7 +14,7 @@ function EcranNoireAceuille() {
   const [nothing, setNothing] = useState(false)
 
   useEffect(() => {
-    let wiiThemAudio; // Déclarer wiiThemAudio en dehors du if
+    let wiiThemAudio;
   
     if (!drow) {
       const timeout = setTimeout(() => {
@@ -28,7 +28,7 @@ function EcranNoireAceuille() {
       };
   
       const playSoundWiiThemSound = () => {
-        wiiThemAudio = new Audio(wiiThemSound); // Assigner à wiiThemAudio
+        wiiThemAudio = new Audio(wiiThemSound);
         wiiThemAudio.volume = 0.5;
         wiiThemAudio.loop = true;
         wiiThemAudio.play();
@@ -38,7 +38,6 @@ function EcranNoireAceuille() {
       playSoundWiiStartSound();
   
       return () => {
-        // Arrêter la musique quand le composant est démonté ou lorsque drow devient true
         if (wiiThemAudio) {
           wiiThemAudio.pause();
           wiiThemAudio.currentTime = 0;
@@ -46,7 +45,6 @@ function EcranNoireAceuille() {
         clearTimeout(timeout);
       };
     } else {
-      // Si drow devient true, arrêter la musique
       if (wiiThemAudio) {
         wiiThemAudio.pause();
         wiiThemAudio.currentTime = 0;
