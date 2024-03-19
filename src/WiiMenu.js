@@ -4,6 +4,7 @@ import './button.css';
 import './input.css';
 import './texte.css';
 import wiiSelectSound from './sond/Wii - System BIOS Wii - Sound Effects/Wii BIOS/WSD-SELECT.wav';
+import wiiStartSound from './sond/Wii - System BIOS Wii - Sound Effects/Wii BIOS/WII-START.wav';
 import WiiTv from './WiiTv';
 import BarBottom from './BarBottom'
 
@@ -15,6 +16,12 @@ function EcranNoireAceuille() {
     if (!drow) {
       const timeout = setTimeout(() => {
         setNothing(true);
+        const playSoundWiiStartSound = () => {
+          const audio = new Audio(wiiStartSound);
+          audio.volume = 0.5;
+          audio.play();
+        };
+        playSoundWiiStartSound()
       }, 1000);
 
       return () => clearTimeout(timeout);

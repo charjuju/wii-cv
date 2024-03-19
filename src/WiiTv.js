@@ -12,7 +12,6 @@ export default function WiiTv({ info, updateTvTabInfo }) {
     const [imgFond, setImgFond] = useState(info.res.imgFond);
     const [imgCover, setImgCover] = useState(info.res.imgCover);
 
-
     const getDivPosition = () => {
         if (tvRef.current) {
             const rect = tvRef.current.getBoundingClientRect();
