@@ -1,7 +1,9 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import {useNavigate } from "react-router-dom";
 
 export default function WiiTv({ info, updateTvTabInfo }) {
+    const navigate = useNavigate();
     const tvRef = useRef(null);
     const [showSquare, setShowSquare] = useState(false);
     const [squarePosition, setSquarePosition] = useState({ x: 0, y: 0 });
@@ -57,8 +59,8 @@ export default function WiiTv({ info, updateTvTabInfo }) {
                     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div className="classic-back" style={{ height: '20%', width: '100%', display: 'flex', justifyContent: "space-around", alignItems: 'center' }}>
                             <div />
-                            <button style={{ height: '60%', width: '25%', borderRadius: '100px', backgroundColor: 'white', border: '3px solid #69c5e2', color: 'black', fontSize: '50px' }} onClick={handleSquareReturn}>Wii Menu</button>
-                            <button style={{ height: '60%', width: '25%', borderRadius: '100px', backgroundColor: 'white', border: '3px solid #69c5e2', color: 'black', fontSize: '50px' }} onClick={handleSquareReturn}>Start</button>
+                            <button style={{ height: '60%', width: '25%', borderRadius: '100px', backgroundColor: 'white', border: '3px solid #69c5e2', color: 'black', fontSize: '50px' }} onClick={() => handleSquareReturn()}>Wii Menu</button>
+                            <button style={{ height: '60%', width: '25%', borderRadius: '100px', backgroundColor: 'white', border: '3px solid #69c5e2', color: 'black', fontSize: '50px' }} onClick={() => {info.res.relative ? navigate(info.res.url): window.open(info.res.url, "_blank")}}>Start</button>
                             <div />
                         </div>
                         <div>

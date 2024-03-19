@@ -85,6 +85,7 @@ function App() {
     console.log("LOAD: information wii tv")
     for (let i = 0; i < 48; i++) {
       wiiTvInfo.push({
+        relative: true,
         nom: 'unknown',
         url: 'unknown',
         imgFond: 'wii-channel-static-empty-wii-channel.gif',
@@ -92,6 +93,34 @@ function App() {
       });
     }
     wiiTvInfo[0].imgCover = "regard.jpg"
+    wiiTvInfo[1] = {
+      relative: false,
+      nom: 'Gmail',
+      url: 'https://www.gmail.com',
+      imgFond: 'gmail-fond.webp',
+      imgCover: 'gmail-Tv-logo.png',
+    }
+    wiiTvInfo[4] = {
+      relative: false,
+      nom: 'outlook',
+      url: 'https://www.outlook.com',
+      imgFond: 'outlook-wallpeper.jpg',
+      imgCover: 'outlookCover.webp',
+    }
+    wiiTvInfo[7] = {
+      relative: false,
+      nom: 'yahoo',
+      url: 'https://www.yahoo.fr',
+      imgFond: 'yahoo-fond.webp',
+      imgCover: 'yahoo-cover.jpeg',
+    }
+    wiiTvInfo[3] = {
+      relative: false,
+      nom: 'linkedin',
+      url: 'https://www.linkedin.com/in/jude-marzat-6a16bb208',
+      imgFond: 'linkdinFond.jpg',
+      imgCover: 'linkdin.webp',
+    }
     console.log(wiiTvInfo)
     setTvTabInfo(wiiTvInfo);
   }, [])
