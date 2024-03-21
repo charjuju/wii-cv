@@ -1,6 +1,7 @@
 import WiiMenu from './WiiMenu'
 import Competence from './Competence/Competence'
 import { BrowserRouter, Routes, Route} from "react-router-dom";
+import Gelarie from './Galerie/Galerie'
 import './App.css';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
           <Routes>
           <Route path="/" element={<WiiMenu />} />
           <Route path="/Compétence" element={<Competence />} />
+          <Route path="/Galerie" element={<Gelarie />} />
           <Route path="/*" element={<p>404</p>} />
           </Routes>
         </div>

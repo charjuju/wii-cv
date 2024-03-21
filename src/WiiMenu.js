@@ -115,6 +115,13 @@ function App() {
       imgFond: "regard.jpg",
       imgCover: "regard.jpg",
     }
+    wiiTvInfo[6] = {
+      relative: true,
+      nom: 'Gmail',
+      url: 'Galerie',
+      imgFond: 'Galerie/galerie2.png',
+      imgCover: 'Galerie/galerie.png',
+    }
     wiiTvInfo[1] = {
       relative: false,
       nom: 'Gmail',

@@ -4,18 +4,28 @@ import { TapingAnimationText } from "./Tools/text";
 import { motion } from 'framer-motion';
 import DVD from './Tools/DVD'
 import LangageC from './c'
+import ReactLangage from './React'
+import Python from './Python'
+import Linux from './Linux'
+import Strapi from './Strapi'
+import Html from './Html'
+import JavaS from './JavaS'
+import Css from './CSS'
+import GitHub from './Github'
+import Docker from './Docker'
+import Cpp from './Cpp'
 
-const dvdList = [{ src: "competenceIco/c.png" },
-{ src: "competenceIco/cpp.png" },
-{ src: "competenceIco/free-docker-12-1175229.png" },
-{ src: "competenceIco/github.png" },
-{ src: "competenceIco/html.png" },
-{ src: "competenceIco/internet.svg" },
-{ src: "competenceIco/javascrypt.png" },
-{ src: "competenceIco/strapi.png" },
-{ src: "competenceIco/linux-icon-2048x2048-sy06t4un.png" },
-{ src: "competenceIco/python.png" },
-{ src: "competenceIco/React-icon.svg.png" }]
+const dvdList = [{ src: "competenceIco/c.png", result: <LangageC /> },
+{ src: "competenceIco/cpp.png", result: <Cpp />  },
+{ src: "competenceIco/free-docker-12-1175229.png", result: <Docker />  },
+{ src: "competenceIco/github.png", result: <GitHub />  },
+{ src: "competenceIco/html.png", result: <Html />  },
+{ src: "competenceIco/internet.svg", result: <Css />  },
+{ src: "competenceIco/javascrypt.png", result: <JavaS />  },
+{ src: "competenceIco/strapi.png", result: <Strapi />  },
+{ src: "competenceIco/linux-icon-2048x2048-sy06t4un.png", result: <Linux />  },
+{ src: "competenceIco/python.png", result: <Python />  },
+{ src: "competenceIco/React-icon.svg.png", result: <ReactLangage />  }]
 
 function Competence() {
     const [spleet, setSpleet] = useState(false);
@@ -31,7 +41,7 @@ function Competence() {
     };
 
     return (
-        <div>
+        <div style={{width: '100vw', overflow: 'hidden'}}>
             <TapingAnimationText el="p" text={"Compétence"} className="competence-titre" />
             <div style={{ display: 'flex' }}>
                 <div style={{ display: 'flex', alignItems: 'center', width: '50%', marginLeft: '50px' }}>
@@ -82,8 +92,8 @@ function Competence() {
                     <img ref={imgRef} alt="wii" src="wii.png" style={{ height: 400}} />
                 </motion.div>
             </div>
-            {selectedDVD === 0 &&
-                <LangageC />
+            {selectedDVD !== null &&
+                dvdList[selectedDVD].result
             }
         </div>
     );

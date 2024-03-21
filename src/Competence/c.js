@@ -1,95 +1,5 @@
 import React from 'react';
-import { motion, useAnimation } from 'framer-motion';
-
-const AnimationDecente = ({ children }) => {
-    const controls = useAnimation();
-
-    const variants = {
-        visible: { opacity: 1, y: 0 },
-        hidden: { opacity: 0, y: -40 },
-    };
-
-    return (
-        <motion.div
-            initial="hidden"
-            animate={controls}
-            variants={variants}
-            transition={{ duration: 1.5 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            onViewportEnter={() => controls.start("visible")}
-        >
-            {children}
-        </motion.div>
-    );
-};
-
-const AnimationApparetDeLaDroite = ({ children }) => {
-    const controls = useAnimation();
-
-    const variants = {
-        visible: { opacity: 1, x: 0 },
-        hidden: { opacity: 0, x: "100%" },
-    };
-
-    return (
-        <motion.div
-            initial="hidden"
-            animate={controls}
-            variants={variants}
-            transition={{ duration: 1.5 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            onViewportEnter={() => controls.start("visible")}
-        >
-            {children}
-        </motion.div>
-    );
-};
-/*
-const RotationAnimation = ({ children, style }) => {
-    const controls = useAnimation();
-
-    const variants = {
-        visible: { opacity: 1, rotate: 0 },
-        hidden: { opacity: 0, rotate: -350 },
-    };
-
-    return (
-        <motion.div
-            style={style}
-            initial="hidden"
-            animate={controls}
-            variants={variants}
-            transition={{ duration: 1 }}
-            whileInView={{ opacity: 1, rotate: 0 }}
-            onViewportEnter={() => controls.start("visible")}
-        >
-            {children}
-        </motion.div>
-    );
-};
-*/
-const PopAnimation = ({ children, style }) => {
-    const controls = useAnimation();
-  
-    const variants = {
-      visible: { opacity: 1, scale: 1 },
-      hidden: { opacity: 0, scale: 0.8 },
-    };
-  
-    return (
-      <motion.div
-      style={style}
-        initial="hidden"
-        animate={controls}
-        variants={variants}
-        transition={{ type: 'spring', duration: 1}}
-        whileInView={{ opacity: 1, scale: 1 }}
-        onViewportEnter={() => controls.start("visible")}
-      >
-        {children}
-      </motion.div>
-    );
-  };
+import { AnimationDecente, AnimationApparetDeLaDroite, PopAnimation} from './Tools/text'
 
 export default function LangageC() {
     return (
@@ -102,7 +12,7 @@ export default function LangageC() {
                     <AnimationDecente><h1 style={{ fontSize: '50px' }}>Comment j'ai découvert le C</h1></AnimationDecente>
                     <p style={{ fontSize: '40px', marginLeft: '40px' }}>J'ai découvert le langage C à l'école, plus précisément à Epitech. C'était le tout premier langage que j'ai vraiment appris en profondeur, et c'est là que j'ai développé une solide base en programmation.</p>
                 </div>
-                <PopAnimation style={{height: '600px', width: '50%'}}>
+                <PopAnimation style={{ height: '600px', width: '50%' }}>
                     <div style={{
                         backgroundImage: `url('https://www.epitech.digital/wp-content/uploads/2022/11/Epitech_Digital_2022_bdx_photos_sites_web_2.jpg')`,
                         backgroundSize: 'cover',
