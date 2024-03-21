@@ -16,7 +16,7 @@ import Docker from './Docker'
 import Cpp from './Cpp'
 
 const dvdList = [{ src: "competenceIco/c.png", result: <LangageC /> },
-{ src: "competenceIco/cpp.png", result: <Cpp />  },
+{ src: "competenceIco/cpp.jpg", result: <Cpp />  },
 { src: "competenceIco/free-docker-12-1175229.png", result: <Docker />  },
 { src: "competenceIco/github.png", result: <GitHub />  },
 { src: "competenceIco/html.png", result: <Html />  },

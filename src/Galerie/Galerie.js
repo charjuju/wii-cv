@@ -41,7 +41,7 @@ const Gallery = () => {
                         letterSpacing: "2px",
                     }}
                 >
-                    Galerie Funky Pop
+                    Galerie mon petit musée!
                 </motion.h1>
                 <div style={{ height: '100px' }} />
                 <div className="artwork-container">
