@@ -8,8 +8,8 @@ export default function LangageCPP() {
 
             <div style={{ display: 'flex', width: '80%', justifyContent: 'space-around' }}>
                 <div style={{ width: '50%' }}>
-                    <AnimationDecente><h1 style={{ fontSize: '50px', color: '#ffb633' }}>Découverte du C++</h1></AnimationDecente>
-                    <p style={{ fontSize: '40px', marginLeft: '40px', color: '#33ffbd' }}>J'ai commencé ça en faisant du C orienté objet (ce n'est pas fameux) mais ça faisait partie de la piscine de C++ proposée par Epitech. Vu que je connaissais déjà le C, j'ai vite pris en main le langage même si j'avoue j'étais encore bien accroché à mes amis malloc</p>
+                    <AnimationDecente><h1 style={{ fontSize: '50px'}}>Découverte du C++</h1></AnimationDecente>
+                    <p style={{ fontSize: '40px', marginLeft: '40px' }}>J'ai commencé ça en faisant du C orienté objet (ce n'est pas fameux) mais ça faisait partie de la piscine de C++ proposée par Epitech. Vu que je connaissais déjà le C, j'ai vite pris en main le langage même si j'avoue j'étais encore bien accroché à mes amis malloc</p>
                 </div>
                 <PopAnimation style={{ height: '600px', width: '50%' }}>
                     <div style={{
@@ -35,14 +35,14 @@ export default function LangageCPP() {
                 }} >
                 </div>
                 <div style={{ width: '50%', overflowY: 'scroll', height: '600px' }}>
-                    <AnimationDecente><h1 style={{ fontSize: '50px', marginLeft: '10px', color: '#ff3333' }}>Quoi tu connais pas le C++! hé hé...</h1></AnimationDecente>
-                    <p style={{ fontSize: '40px', marginLeft: '60px', color: '#33ffbd' }}>C'est un langage de programmation puissant et flexible. Imagine les jeux vidéo hyper réalistes, les logiciels bancaires et les systèmes d'exploitation : c'est possible avec le C++ ! C'est un langage compilé et orienté objet. Il te permet de créer du code précis et efficace, et de l'organiser de manière propre et réutilisable.</p>
+                    <AnimationDecente><h1 style={{ fontSize: '50px', marginLeft: '10px'}}>Quoi tu connais pas le C++! hé hé...</h1></AnimationDecente>
+                    <p style={{ fontSize: '40px', marginLeft: '60px' }}>C'est un langage de programmation puissant et flexible. Imagine les jeux vidéo hyper réalistes, les logiciels bancaires et les systèmes d'exploitation : c'est possible avec le C++ ! C'est un langage compilé et orienté objet. Il te permet de créer du code précis et efficace, et de l'organiser de manière propre et réutilisable.</p>
                 </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '80%' }}>
-                <AnimationApparetDeLaDroite><h1 style={{ fontSize: '50px', color: '#ffb633' }}>Le c++ est moi.</h1></AnimationApparetDeLaDroite>
-                <p style={{ fontSize: '30px', width: '100%', color: '#33ffbd' }}>basiquement comme le c vue que c'est mon ecole qui me la appris, comment ça ta pas lu la partie sur le c?</p>
-                <p style={{ fontSize: '30px', width: '100%', color: '#ff5733' }}>C'est le 3ème langage que j'ai appris après le C et le Python.
+                <AnimationApparetDeLaDroite><h1 style={{ fontSize: '50px'}}>Le c++ et moi.</h1></AnimationApparetDeLaDroite>
+                <p style={{ fontSize: '30px', width: '100%' }}>basiquement comme le c vu que c'est mon ecole qui me l'appris, comment ça t'as pas lu la partie sur le c?</p>
+                <p style={{ fontSize: '30px', width: '100%'}}>C'est le 3ème langage que j'ai appris après le C et le Python.
 
 Les projets que j'ai réalisés sont :
 
