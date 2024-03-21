@@ -3,20 +3,11 @@ import { motion } from 'framer-motion';
 import './Galerie.css'
 
 const art = [
-    { nom: "Art1", src: "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg" },
-    { nom: "Art1", src: "https://assets-global.website-files.com/62a9e41d28a7ab25849bce9c/62fcab0db38819bef2500673_Is%20image%20processing%20part%20of%20machine%20learning.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-    { nom: "Art1", src: "https://assets-global.website-files.com/62a9e41d28a7ab25849bce9c/62fcab0db38819bef2500673_Is%20image%20processing%20part%20of%20machine%20learning.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-    { npm: "Art1", src: "https://assets-global.website-files.com/62a9e41d28a7ab25849bce9c/62fcab0db38819bef2500673_Is%20image%20processing%20part%20of%20machine%20learning.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-    { npm: "Art1", src: "https://assets-global.website-files.com/62a9e41d28a7ab25849bce9c/62fcab0db38819bef2500673_Is%20image%20processing%20part%20of%20machine%20learning.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-    { nom: "Art1", src: "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg" },
-
+    { nom: "Art1", src: "/Galerie/autruchC.png" },
+    { nom: "Art1", src: "/Galerie/autruche_fort.png" },
+    { nom: "Art1", src: "/Galerie/pingoin.png" },
+    { nom: "Art1", src: "/Galerie/python.png" },
+    { nom: "Art1", src: "/Galerie/wallPeper.png" },
 ];
 
 const Gallery = () => {
@@ -92,7 +83,5 @@ const Gallery = () => {
         </div>
     );
 };
-
-
 
 export default Gallery;
