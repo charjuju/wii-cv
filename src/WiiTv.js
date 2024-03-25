@@ -1,18 +1,14 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export default function WiiTv({ info, updateTvTabInfo }) {
+export default function WiiTv({ info}) {
     const navigate = useNavigate();
     const tvRef = useRef(null);
     const [showSquare, setShowSquare] = useState(false);
     const [squarePosition, setSquarePosition] = useState({ x: 0, y: 0 });
 
     const [EditMode, setEditMode] = useState(false);
-    const [nom, setNom] = useState(info.res.nom);
-    const [url, setUrl] = useState(info.res.url);
-    const [imgFond, setImgFond] = useState(info.res.imgFond);
-    const [imgCover, setImgCover] = useState(info.res.imgCover);
 
     const getDivPosition = () => {
         if (tvRef.current) {
@@ -27,21 +23,8 @@ export default function WiiTv({ info, updateTvTabInfo }) {
         setShowSquare(false);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        updateTvTabInfo(info.index, {
-            nom: nom,
-            url: url,
-            imgFond: imgFond,
-            imgCover: imgCover,
-        })
-        setNom('');
-        setUrl('');
-        setImgFond('');
-        setImgCover('');
-    }
     return (
-        <div onClick={!showSquare ? getDivPosition : console.log("ok")} style={{backgroundImage: `url(${info.res.imgCover})`}} className='tv-noise' ref={tvRef}>
+        <div onClick={!showSquare ? getDivPosition : console.log("ok")} style={{ backgroundImage: `url(${info.res.imgCover})` }} className='tv-noise' ref={tvRef}>
             {showSquare && <div className="go-black" />}
             {showSquare && (
                 <motion.div
@@ -59,53 +42,14 @@ export default function WiiTv({ info, updateTvTabInfo }) {
                     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div className="classic-back" style={{ height: '20%', width: '100%', display: 'flex', justifyContent: "space-around", alignItems: 'center' }}>
                             <div />
-                            <button style={{ height: '60%', width: '25%', borderRadius: '100px', backgroundColor: 'white', border: '3px solid #69c5e2', color: 'black', fontSize: '50px' }} onClick={() => handleSquareReturn()}>Wii Menu</button>
-                            <button style={{ height: '60%', width: '25%', borderRadius: '100px', backgroundColor: 'white', border: '3px solid #69c5e2', color: 'black', fontSize: '50px' }} onClick={() => {info.res.relative ? navigate(info.res.url): window.open(info.res.url, "_blank")}}>Start</button>
+                            <button className="button-tv" onClick={() => handleSquareReturn()}>Wii Menu</button>
+                            <button className="button-tv" onClick={() => { info.res.relative ? navigate(info.res.url) : window.open(info.res.url, "_blank") }}>Start</button>
                             <div />
                         </div>
-                        <div>
-                            <img style={{ height: '100px', borderRadius: '100px', backgroundColor: '#e3e3e3', border: '3px solid #47b4cb' }} alt="Edit" src="tools.png" onClick={() => setEditMode(!EditMode)} />
-                            {EditMode &&
-                                <form onSubmit={handleSubmit}>
-                                    <div>
-                                        <label>Nom:</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Nom"
-                                            value={nom}
-                                            onChange={(e) => setNom(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label>URL:</label>
-                                        <input
-                                            type="text"
-                                            placeholder="URL"
-                                            value={url}
-                                            onChange={(e) => setUrl(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label>Image de fond:</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Image de fond"
-                                            value={imgFond}
-                                            onChange={(e) => setImgFond(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label>Image de couverture:</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Image de couverture"
-                                            value={imgCover}
-                                            onChange={(e) => setImgCover(e.target.value)}
-                                        />
-                                    </div>
-                                    <button type="submit">Ajouter Info Wii TV</button>
-                                </form>
-                            }
+                        <div className="tv-phone-cover" style={{ height: '100%', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)', width: '100%'}}>
+                            <div style={{ height: '100%', display: 'flex', alignItems: 'center'}}>
+                                <img alt="cover" style={{width: "100%", maxHeight: "70vh"}} className="tv-phone-cover" src={info.res.imgFond} onClick={() => setEditMode(!EditMode)} />
+                            </div>
                         </div>
                     </div>
                 </motion.div>

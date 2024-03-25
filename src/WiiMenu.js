@@ -85,16 +85,6 @@ function EcranNoireAceuille() {
 function App() {
   const [tvTabInfo, setTvTabInfo] = useState([])
 
-  function updateTvTabInfo(index, info) {
-    if (index >= 0 && index < tvTabInfo.length) {
-      const updatedTvTabInfo = [...tvTabInfo];
-      updatedTvTabInfo[index] = info;
-      setTvTabInfo(updatedTvTabInfo);
-    } else {
-      console.error("ERROR: L'index fourni est invalide!");
-    }
-  };
-
   useEffect(() => {
     let wiiTvInfo = [];
 
@@ -166,7 +156,7 @@ function App() {
       <div className='all-tv-conteneur'>
         {tvTabInfo.map((tv, index) => (
           <div key={index} className="tv-info">
-            <WiiTv updateTvTabInfo={updateTvTabInfo} info={{ index: index, res: tv }} />
+            <WiiTv info={{ index: index, res: tv }} />
           </div>
         ))}
       </div>

@@ -161,3 +161,72 @@
     opacity: 0;
   }
 }
+
+.digital-clock-conteneur {
+  position: absolute;
+  width: 100%;
+  top: 30px;
+}
+
+.button-tv {
+  height: 60%;
+  width: 25%;
+  border-radius: 100px;
+  background-color: white;
+  border: 3px solid #69c5e2;
+  color: black;
+  font-size: 50px;
+}
+
+.tv-phone-cover {
+  display: none;
+}
+
+@media only screen and (max-width: 767px) {
+
+  .tv-phone-cover {
+    display: flex;
+  }
+
+  .button-tv {
+    height: 50px;
+    width: 40%;
+    border-radius: 100px;
+    background-color: white;
+    border: 3px solid #69c5e2;
+    color: black;
+    font-size: 20px;
+  }
+
+  .tv-noise {
+    width: 40vw;
+    height: 30vh;
+    border-radius: 8%;
+    border: 3px solid #c2c3b9;
+  }
+
+  .tv-noise:hover {
+    width: 40vw;
+    height: 30vh;
+    border-radius: 8%;
+    border: 3px solid #69c5e2;
+  }
+
+  .all-tv-conteneur {
+    width: 90vw;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow: hidden;
+    padding-top: 10vh;
+    display: flex;
+    height: 90vh;
+    padding-left: 10vw;
+    gap: 3% 1%;
+  }
+
+  .digital-clock-conteneur {
+    position: absolute;
+    width: 100%;
+    top: -50px;
+  }
+}

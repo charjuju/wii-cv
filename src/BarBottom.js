@@ -102,7 +102,7 @@ export default function BarBottom() {
 
     return (
         <div style={{ position: 'fixed', bottom: '0px', width: '100vw' }}>
-            <div style={{ position: 'absolute', width: '100%', top: '30px' }}>
+            <div className='digital-clock-conteneur'>
                 <DigitalClock />
             </div>
             <div style={{ position: 'absolute', width: '100%', top: '150px' }}>
