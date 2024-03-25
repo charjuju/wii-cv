@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 import './Galerie.css'
 
 const art = [
-    { nom: "Art1", src: "/Galerie/autruchC.png" },
-    { nom: "Art1", src: "/Galerie/autruche_fort.png" },
-    { nom: "Art1", src: "/Galerie/pingoin.png" },
-    { nom: "Art1", src: "/Galerie/python.png" },
-    { nom: "Art1", src: "/Galerie/wallPeper.png" },
+    { nom: "Autruche du hasard", src: "/Galerie/autruchC.png" },
+    { nom: "Autruche le barbar", src: "/Galerie/autruche_fort.png" },
+    { nom: "Coin coin", src: "/Galerie/pingoin.png" },
+    { nom: "Pythonnn", src: "/Galerie/python.png" },
+    { nom: "wallpaper Frog", src: "/Galerie/wallPeper.png" },
 ];
 
 const Gallery = () => {
