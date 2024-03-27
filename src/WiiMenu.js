@@ -88,10 +88,9 @@ function App() {
 
   const handleScroll = () => {
     if (conteneurRef.current) {
-      const conteneur = conteneurRef.current;
-      const scrollAmount = conteneur.scrollWidth * 0.25;
-      conteneur.scrollBy({
-        left: scrollAmount,
+      const screenWidth = window.innerWidth;
+      conteneurRef.current.scrollBy({
+        left: screenWidth,
         behavior: 'smooth'
       });
     }
@@ -100,7 +99,7 @@ function App() {
   const handleUnScroll = () => {
     if (conteneurRef.current) {
       const conteneur = conteneurRef.current;
-      const scrollAmount = conteneur.scrollWidth * -0.25;
+      const scrollAmount = window.innerWidth * -1;
       conteneur.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
