@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef} from 'react';
 import './App.css';
 import './button.css';
 import './input.css';
@@ -84,6 +84,29 @@ function EcranNoireAceuille() {
 
 function App() {
   const [tvTabInfo, setTvTabInfo] = useState([])
+  const conteneurRef = useRef(null);
+
+  const handleScroll = () => {
+    if (conteneurRef.current) {
+      const conteneur = conteneurRef.current;
+      const scrollAmount = conteneur.scrollWidth * 0.25;
+      conteneur.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleUnScroll = () => {
+    if (conteneurRef.current) {
+      const conteneur = conteneurRef.current;
+      const scrollAmount = conteneur.scrollWidth * -0.25;
+      conteneur.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   useEffect(() => {
     let wiiTvInfo = [];
@@ -153,7 +176,11 @@ function App() {
   return (
     <div className="App" onClick={playSoundWiiSelectSound}>
       <EcranNoireAceuille />
-      <div className='all-tv-conteneur'>
+      <div style={{position: 'fixed', width: '100vw', display: 'flex', justifyContent: 'space-between', top: '45%'}}>
+        <img style={{transform: 'rotate(180deg)'}} onClick={handleUnScroll} alt='next-page' src='next.png' />
+        <img onClick={handleScroll} alt='next-page' src='next.png' />
+      </div>
+      <div className='all-tv-conteneur' ref={conteneurRef}>
         {tvTabInfo.map((tv, index) => (
           <div key={index} className="tv-info">
             <WiiTv info={{ index: index, res: tv }} />
