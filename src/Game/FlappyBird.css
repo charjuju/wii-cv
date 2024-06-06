@@ -1,0 +1,41 @@
+.game-area {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    background-color: #70c5ce;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.bird {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: #f9c74f;
+    left: 50px;
+}
+
+.bird-image {
+    width: 100%;
+    height: 100%;
+    background-image: url('Competence.gif');
+    /* Ajoutez votre image de l'oiseau ici */
+    background-size: cover;
+}
+
+.pipe {
+    position: absolute;
+    width: 60px;
+    height: 150px;
+    background-color: #2a9d8f;
+}
+
+.score {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.game-over {
+    text-align: center;
+    margin-top: 20px;
+}

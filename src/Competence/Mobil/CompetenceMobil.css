@@ -1,0 +1,33 @@
+.competence-display {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #fff;
+    border-top: 2px solid #ddd;
+    border-bottom: 2px solid #ddd;
+}
+
+.nav-bar {
+    position: fixed;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    width: 100vw;
+    background-color: #333;
+    overflow-x: scroll;
+    bottom: 0;
+}
+
+.nav-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.nav-icon:hover {
+    transform: scale(1.2);
+}
