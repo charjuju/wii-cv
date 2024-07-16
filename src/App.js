@@ -2,7 +2,6 @@ import WiiMenu from './WiiMenu'
 import Competence from './Competence/Competence'
 import { BrowserRouter, Routes, Route} from "react-router-dom";
 import Gelarie from './Galerie/Galerie'
-import FlappyBird from './Game/FlappyBird.js'
 import './App.css';
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
           <Route path="/" element={<WiiMenu />} />
           <Route path="/Compétence" element={<Competence />} />
           <Route path="/Galerie" element={<Gelarie />} />
-          <Route path="/FlappyBird" element={<FlappyBird />} />
           <Route path="/*" element={<p>404</p>} />
           </Routes>
         </div>
