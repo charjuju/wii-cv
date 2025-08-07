@@ -1,7 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { Upload, Download, Copy, Check, Users, Wifi, Share2, AlertCircle } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Upload, Download, Copy, Check, Wifi, AlertCircle } from 'lucide-react';
 import "./Competence.css"
-import { color } from 'framer-motion';
 
 const P2PFileTransfer = () => {
     const [isHost, setIsHost] = useState(false);
