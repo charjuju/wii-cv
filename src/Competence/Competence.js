@@ -243,7 +243,7 @@ const P2PFileTransfer = () => {
 
         } catch (error) {
             console.error('Error handling offer:', error);
-            alert('Erreur lors du traitement de l\'offre. Vérifiez le format.');
+            alert('8======D');
         }
     };
 
@@ -262,13 +262,13 @@ const P2PFileTransfer = () => {
     // Envoyer un fichier
     const sendFile = async () => {
         if (!file || !dataChannel.current) {
-            alert('Fichier ou canal de données manquant');
+            alert('8======D');
             return;
         }
 
         console.log('Data channel readyState:', dataChannel.current.readyState);
         if (dataChannel.current.readyState !== 'open') {
-            alert('Canal de données non prêt. État actuel: ' + dataChannel.current.readyState);
+            alert('8======D' + dataChannel.current.readyState);
             return;
         }
 
@@ -344,7 +344,7 @@ const P2PFileTransfer = () => {
 
         } catch (error) {
             console.error('Error during file transfer:', error);
-            alert('Erreur pendant le transfert : ' + error.message);
+            alert('8======D' + error.message);
         } finally {
             setIsTransferring(false);
         }
