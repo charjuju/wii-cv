@@ -621,7 +621,6 @@ const P2PFileTransfer = () => {
                                     color: greenMi,
                                     fontFamily: 'monospace',
                                     fontSize: '12px',
-                                    resize: 'vertical',
                                     boxSizing: 'border-box',
                                     backgroundColor: blackMi,
                                     overflow: 'hidden',
