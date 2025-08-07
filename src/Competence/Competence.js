@@ -1,127 +1,1097 @@
-import React, { useState, useRef, useEffect } from 'react';
-import "./Competence.css";
-import { TapingAnimationText } from "./Tools/text";
-import { motion } from 'framer-motion';
-import DVD from './Tools/DVD'
-import LangageC from './c'
-import ReactLangage from './React'
-import Python from './Python'
-import Linux from './Linux'
-import Strapi from './Strapi'
-import Html from './Html'
-import JavaS from './JavaS'
-import Css from './CSS'
-import GitHub from './Github'
-import Docker from './Docker'
-import Cpp from './Cpp'
-import CompetenceMobil from './Mobil/CompetenceMobil'
+import React, { useState, useRef } from 'react';
+import { Upload, Download, Copy, Check, Users, Wifi, Share2, AlertCircle } from 'lucide-react';
+import "./Competence.css"
+import { color } from 'framer-motion';
 
-const dvdList = [{ src: "competenceIco/c.png", result: <LangageC /> },
-{ src: "competenceIco/cpp.jpg", result: <Cpp /> },
-{ src: "competenceIco/free-docker-12-1175229.png", result: <Docker /> },
-{ src: "competenceIco/github.png", result: <GitHub /> },
-{ src: "competenceIco/html.png", result: <Html /> },
-{ src: "competenceIco/internet.svg", result: <Css /> },
-{ src: "competenceIco/javascrypt.png", result: <JavaS /> },
-{ src: "competenceIco/strapi.png", result: <Strapi /> },
-{ src: "competenceIco/linux-icon-2048x2048-sy06t4un.png", result: <Linux /> },
-{ src: "competenceIco/python.png", result: <Python /> },
-{ src: "competenceIco/React-icon.svg.png", result: <ReactLangage /> }]
+const P2PFileTransfer = () => {
+    const [isHost, setIsHost] = useState(false);
+    const [remoteId, setRemoteId] = useState('');
+    const [isConnected, setIsConnected] = useState(false);
+    const [file, setFile] = useState(null);
+    const [transferProgress, setTransferProgress] = useState(0);
+    const [isTransferring, setIsTransferring] = useState(false);
+    const [receivedFile, setReceivedFile] = useState(null);
+    const [copied, setCopied] = useState(false);
+    const [connectionStatus, setConnectionStatus] = useState('disconnected');
+    const [dataChannelReady, setDataChannelReady] = useState(false);
+    const [offer, setOffer] = useState('');
+    const [answer, setAnswer] = useState('');
+    const [showOfferAnswer, setShowOfferAnswer] = useState(false);
 
-function Competence() {
-    const [spleet, setSpleet] = useState(false);
-    const [selectedDVD, setSelectedDVD] = useState(null);
-    const imgRef = useRef(null);
-    const [isScreenSmall, setIsScreenSmall] = useState(window.innerWidth < 1000);
+    const peerConnection = useRef(null);
+    const dataChannel = useRef(null);
+    const fileInput = useRef(null);
 
-    // Fonction pour mettre à jour l'état en fonction de la largeur de l'écran
-    const handleResize = () => {
-        setIsScreenSmall(window.innerWidth < 1000);
+    const blackMi = "black";
+    const greenMi = "yellowgreen"
+
+    // Configuration ICE servers (STUN)
+    const iceConfiguration = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' }
+        ]
     };
 
-    // Utilise useEffect pour ajouter un event listener pour le redimensionnement de la fenêtre
-    useEffect(() => {
-        window.addEventListener('resize', handleResize);
+    // Initialiser la connexion WebRTC
+    const initializePeerConnection = () => {
+        peerConnection.current = new RTCPeerConnection(iceConfiguration);
 
-        // Nettoyage de l'event listener lorsque le composant est démonté
-        return () => {
-            window.removeEventListener('resize', handleResize);
+        peerConnection.current.onicecandidate = (event) => {
+            // Les candidats ICE seront inclus dans l'offre/réponse
+            if (event.candidate === null) {
+                console.log('ICE gathering complete');
+            }
         };
-    }, []);
 
-    const handleFirstAnimationComplete = () => {
-        setSpleet(true);
+        peerConnection.current.onconnectionstatechange = () => {
+            const state = peerConnection.current.connectionState;
+            console.log('Connection state:', state);
+            setConnectionStatus(state);
+            setIsConnected(state === 'connected');
+        };
+
+        peerConnection.current.ondatachannel = (event) => {
+            console.log('Received data channel');
+            dataChannel.current = event.channel;
+            setupDataChannel();
+
+            // S'assurer que le canal est prêt
+            if (event.channel.readyState === 'open') {
+                console.log('Data channel already open');
+                setDataChannelReady(true);
+            }
+        };
     };
 
-    const handleDVDClick = (index) => {
-        setSelectedDVD(index);
+    // Configuration du canal de données
+    const setupDataChannel = () => {
+        if (!dataChannel.current) return;
+
+        console.log('Setting up data channel, readyState:', dataChannel.current.readyState);
+
+        dataChannel.current.onopen = () => {
+            console.log('Data channel opened');
+            setDataChannelReady(true);
+        };
+
+        dataChannel.current.onclose = () => {
+            console.log('Data channel closed');
+            setDataChannelReady(false);
+        };
+
+        dataChannel.current.onerror = (error) => {
+            console.error('Data channel error:', error);
+        };
+
+        dataChannel.current.onmessage = (event) => {
+            console.log('Received message:', event.data.substring(0, 100) + '...');
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Parsed message type:', data.type);
+
+                if (data.type === 'file-info') {
+                    console.log('Receiving file:', data.name, 'chunks:', data.chunks);
+                    expectedChunks.current = data.chunks;
+                    receivedChunks.current = new Array(data.chunks);
+                    fileInfo.current = data;
+                    setIsTransferring(true);
+                    setTransferProgress(0);
+                } else if (data.type === 'file-chunk') {
+                    console.log('Received chunk:', data.index, 'of', expectedChunks.current);
+                    handleFileChunk(data);
+                } else if (data.type === 'file-complete') {
+                    console.log('File transfer complete');
+                    completeFileReceive(data);
+                }
+            } catch (error) {
+                console.error('Error parsing message:', error);
+            }
+        };
+
+        // Test de connexion
+        if (dataChannel.current.readyState === 'open') {
+            console.log('Data channel is already open, sending test message');
+            try {
+                dataChannel.current.send(JSON.stringify({ type: 'test', message: 'Connection test' }));
+            } catch (error) {
+                console.error('Error sending test message:', error);
+            }
+        }
+    };
+
+    // Variables pour la réception de fichiers
+    const receivedChunks = useRef([]);
+    const expectedChunks = useRef(0);
+    const fileInfo = useRef(null);
+
+    // Gérer les chunks de fichier reçus
+    const handleFileChunk = (data) => {
+        // Convertir le base64 en blob
+        const binaryString = atob(data.chunk.split(',')[1]);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        receivedChunks.current[data.index] = bytes;
+
+        const progress = (receivedChunks.current.filter(c => c).length / expectedChunks.current) * 100;
+        setTransferProgress(progress);
+    };
+
+    // Compléter la réception du fichier
+    const completeFileReceive = (data) => {
+        // Assembler tous les chunks
+        const totalSize = receivedChunks.current.reduce((sum, chunk) => sum + (chunk ? chunk.length : 0), 0);
+        const fullFile = new Uint8Array(totalSize);
+        let offset = 0;
+
+        for (const chunk of receivedChunks.current) {
+            if (chunk) {
+                fullFile.set(chunk, offset);
+                offset += chunk.length;
+            }
+        }
+
+        const blob = new Blob([fullFile], { type: data.fileType || 'application/octet-stream' });
+        setReceivedFile({
+            name: data.name,
+            size: data.size,
+            type: data.fileType || 'application/octet-stream',
+            blob: blob,
+            url: URL.createObjectURL(blob)
+        });
+        setIsTransferring(false);
+        setTransferProgress(100);
+
+        // Réinitialiser les variables
+        receivedChunks.current = [];
+        expectedChunks.current = 0;
+        fileInfo.current = null;
+
+        console.log('File reconstruction complete:', data.name);
+    };
+
+    // Créer une offre (Host)
+    const createOffer = async () => {
+        setIsHost(true);
+        initializePeerConnection();
+
+        // Créer le canal de données
+        dataChannel.current = peerConnection.current.createDataChannel('fileTransfer', {
+            ordered: true
+        });
+        setupDataChannel();
+
+        try {
+            const offer = await peerConnection.current.createOffer();
+            await peerConnection.current.setLocalDescription(offer);
+
+            // Attendre que tous les candidats ICE soient collectés
+            await new Promise((resolve) => {
+                if (peerConnection.current.iceGatheringState === 'complete') {
+                    resolve();
+                } else {
+                    peerConnection.current.addEventListener('icegatheringstatechange', () => {
+                        if (peerConnection.current.iceGatheringState === 'complete') {
+                            resolve();
+                        }
+                    });
+                }
+            });
+
+            setOffer(JSON.stringify(peerConnection.current.localDescription));
+            setShowOfferAnswer(true);
+
+        } catch (error) {
+            console.error('Error creating offer:', error);
+        }
+    };
+
+    // Traiter l'offre et créer une réponse (Client)
+    const handleOffer = async (offerString) => {
+        try {
+            initializePeerConnection();
+
+            const offerDesc = JSON.parse(offerString);
+            await peerConnection.current.setRemoteDescription(offerDesc);
+
+            const answer = await peerConnection.current.createAnswer();
+            await peerConnection.current.setLocalDescription(answer);
+
+            // Attendre que tous les candidats ICE soient collectés
+            await new Promise((resolve) => {
+                if (peerConnection.current.iceGatheringState === 'complete') {
+                    resolve();
+                } else {
+                    const timeout = setTimeout(() => {
+                        console.log('ICE gathering timeout, proceeding anyway');
+                        resolve();
+                    }, 10000); // Timeout après 10 secondes
+
+                    peerConnection.current.addEventListener('icegatheringstatechange', () => {
+                        if (peerConnection.current.iceGatheringState === 'complete') {
+                            clearTimeout(timeout);
+                            resolve();
+                        }
+                    });
+                }
+            });
+
+            setAnswer(JSON.stringify(peerConnection.current.localDescription));
+            setShowOfferAnswer(true);
+
+        } catch (error) {
+            console.error('Error handling offer:', error);
+            alert('Erreur lors du traitement de l\'offre. Vérifiez le format.');
+        }
+    };
+
+    // Traiter la réponse (Host)
+    const handleAnswer = async (answerString) => {
+        try {
+            const answerDesc = JSON.parse(answerString);
+            await peerConnection.current.setRemoteDescription(answerDesc);
+            console.log('Answer processed successfully');
+        } catch (error) {
+            console.error('Error handling answer:', error);
+            alert('Erreur lors du traitement de la réponse. Vérifiez le format.');
+        }
+    };
+
+    // Envoyer un fichier
+    const sendFile = async () => {
+        if (!file || !dataChannel.current) {
+            alert('Fichier ou canal de données manquant');
+            return;
+        }
+
+        console.log('Data channel readyState:', dataChannel.current.readyState);
+        if (dataChannel.current.readyState !== 'open') {
+            alert('Canal de données non prêt. État actuel: ' + dataChannel.current.readyState);
+            return;
+        }
+
+        setIsTransferring(true);
+        setTransferProgress(0);
+
+        try {
+            const chunkSize = 16384; // 16KB chunks
+            const chunks = Math.ceil(file.size / chunkSize);
+
+            // Envoyer les infos du fichier
+            const fileInfo = {
+                type: 'file-info',
+                name: file.name,
+                size: file.size,
+                fileType: file.type, // Renommé pour éviter la confusion
+                chunks: chunks
+            };
+
+            console.log('Sending file info:', fileInfo);
+            dataChannel.current.send(JSON.stringify(fileInfo));
+
+            // Petite pause pour s'assurer que l'info est reçue
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Envoyer les chunks
+            const reader = new FileReader();
+
+            for (let i = 0; i < chunks; i++) {
+                const start = i * chunkSize;
+                const end = Math.min(start + chunkSize, file.size);
+                const chunk = file.slice(start, end);
+
+                await new Promise((resolve, reject) => {
+                    reader.onload = () => {
+                        try {
+                            const chunkData = {
+                                type: 'file-chunk',
+                                index: i,
+                                chunk: reader.result
+                            };
+
+                            console.log(`Sending chunk ${i + 1}/${chunks}`);
+                            dataChannel.current.send(JSON.stringify(chunkData));
+                            setTransferProgress(((i + 1) / chunks) * 100);
+                            resolve();
+                        } catch (error) {
+                            console.error('Error sending chunk:', error);
+                            reject(error);
+                        }
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(chunk);
+                });
+
+                // Pause pour éviter la surcharge
+                if (i % 5 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+            }
+
+            // Signaler la fin
+            const completeData = {
+                type: 'file-complete',
+                name: file.name,
+                size: file.size,
+                fileType: file.type // Renommé pour éviter la confusion
+            };
+
+            console.log('Sending completion signal');
+            dataChannel.current.send(JSON.stringify(completeData));
+            console.log('File transfer complete');
+
+        } catch (error) {
+            console.error('Error during file transfer:', error);
+            alert('Erreur pendant le transfert : ' + error.message);
+        } finally {
+            setIsTransferring(false);
+        }
+    };
+
+    // Copier dans le presse-papiers
+    const copyToClipboard = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
+
+    // Télécharger le fichier reçu
+    const downloadFile = () => {
+        if (receivedFile) {
+            const a = document.createElement('a');
+            a.href = receivedFile.url;
+            a.download = receivedFile.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    };
+
+    // Réinitialiser
+    const resetConnection = () => {
+        if (peerConnection.current) {
+            peerConnection.current.close();
+        }
+
+        setIsHost(false);
+        setRemoteId('');
+        setIsConnected(false);
+        setDataChannelReady(false);
+        setFile(null);
+        setReceivedFile(null);
+        setTransferProgress(0);
+        setIsTransferring(false);
+        setConnectionStatus('disconnected');
+        setOffer('');
+        setAnswer('');
+        setShowOfferAnswer(false);
+    };
+
+    const formatFileSize = (bytes) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
     return (
-        <div>
-            {isScreenSmall ? <CompetenceMobil dvdList={dvdList}/> :
-                <div style={{ width: '100vw', overflow: 'hidden' }}>
-                    {isScreenSmall && <p>TELEPHONE</p>}
-                    <TapingAnimationText el="p" text={"Compétence"} className="competence-titre" />
-                    <div style={{ display: 'flex' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', width: '50%', marginLeft: '50px' }}>
-                            {!spleet ?
-                                <div style={{ display: "flex", height: '70%' }}>
-                                    <motion.div
-                                        style={{ position: "absolute" }}
-                                        initial={{ x: -1500, rotate: 0 }}
-                                        animate={{ x: 0, rotate: 720 }}
-                                        transition={{ duration: 1, delay: 0.5 }}
-                                        onAnimationComplete={handleFirstAnimationComplete}
-                                    >
-                                        <DVD size={250} image={dvdList[dvdList.length - 1].src} />
-                                    </motion.div>
-                                </div>
-                                :
-                                <div style={{ display: "flex", height: '70%' }}>
-                                    {imgRef && imgRef.current && dvdList.map((dvd, index) => (
-                                        <motion.div
-                                            key={index}
-                                            style={{ position: "absolute" }}
-                                            initial={{ scale: 1, x: 0, zIndex: 1, rotate: 0 }}
-                                            animate={{
-                                                x: selectedDVD === index ? imgRef.current.getBoundingClientRect().x : index * 50,
-                                                opacity: selectedDVD === index ? 0 : 1,
-                                                rotate: selectedDVD === index ? 800 : 0,
-                                                transition: selectedDVD === index ? { duration: 1 } : { delay: 0.1 }
-                                            }}
-                                            whileHover={selectedDVD === index ? {} : {
-                                                scale: 1.1,
-                                                x: index * 50,
-                                                zIndex: 2,
-                                                transition: { duration: 0.5 }
-                                            }}
-                                            onClick={() => handleDVDClick(index)}
-                                        >
-                                            <DVD size={250} image={dvd.src} />
-                                        </motion.div>
-                                    ))}
-                                    {imgRef && imgRef.current === null && <h1 style={{color: 'blue', cursor: 'pointer'}} onClick={() => window.location.reload()}>
-                                        MAIS NON? t'as perdu tes jeux wii!</h1>}
-                                </div>
-                            }
-                        </div>
-                        <motion.div
-                            initial={{ x: 1000, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ duration: 1, delay: 0.5 }}
+        <div style={{
+            minHeight: '100vh',
+            backgroundColor: blackMi,
+            padding: '16px'
+        }}>
+            {!showOfferAnswer && (
+                <div style={{ textAlign: 'center', height: '100%' }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: '24px',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%'
+                    }}>
+                        <button
+                            onClick={() => createOffer()}
+                            style={{ height: "44px", width: '234px', borderRadius: '0px', borderColor: greenMi, backgroundColor: blackMi, color: greenMi }}
+                            onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = greenMi;
+                                e.target.style.color = blackMi;
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = blackMi;
+                                e.target.style.color = greenMi;
+                            }}
                         >
-                            <img ref={imgRef} alt="wii" src="wii.png" style={{ height: 400 }} />
-                        </motion.div>
+                            ENVOYER SON KiKi
+                        </button>
+                        <div style={{
+                            border: `2px solid ${greenMi}`,
+                            backgroundColor: blackMi,
+                            width: '234px'
+                        }}>
+                            <h3 style={{
+                                fontSize: '20px',
+                                fontWeight: '600',
+                                marginBottom: '16px',
+                                color: greenMi
+                            }}>RECEVOIR SON KiKi</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                                <textarea
+                                    placeholder="Collez le KiKi key"
+                                    value={remoteId}
+                                    onChange={(e) => setRemoteId(e.target.value)}
+                                    style={{
+                                        backgroundColor: blackMi,
+                                        textAlign: 'center',
+                                        textJustify: 'center',
+                                        width: '200px',
+                                        height: '58px',
+                                        color: greenMi,
+                                        border: `1px solid ${greenMi}`,
+                                        resize: 'none',
+                                        fontSize: '20px',
+                                        overflow: 'hidden',
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                                <button
+                                    onClick={() => handleOffer(remoteId)}
+                                    disabled={!remoteId.trim()}
+                                    style={{
+                                        width: '200px',
+                                        backgroundColor: blackMi,
+                                        color: greenMi,
+                                        border: `1px solid ${greenMi}`,
+                                        borderRadius: '0px',
+                                        margin: '8px',
+                                        fontSize: '20px',
+                                        transition: 'background-color 0.2s',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.backgroundColor = greenMi;
+                                        e.target.style.color = blackMi;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.backgroundColor = blackMi;
+                                        e.target.style.color = greenMi;
+                                    }}
+                                >
+                                    KiKi Check
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    {selectedDVD !== null &&
-                        dvdList[selectedDVD].result
-                    }
                 </div>
-            }
+            )}
+
+            {showOfferAnswer && offer && !answer && (
+                <div style={{
+                    backgroundColor: blackMi,
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '16px'
+                    }}>
+                        <AlertCircle style={{
+                            width: '20px',
+                            height: '20px',
+                            color: greenMi,
+                            marginRight: '8px'
+                        }} />
+                        <h3 style={{
+                            fontSize: '18px',
+                            fontWeight: '600',
+                            color: greenMi
+                        }}>Étape 1: Partagez vote KiKi Key</h3>
+                    </div>
+
+                    <p style={{
+                        color: greenMi,
+                        marginBottom: '12px',
+                        fontSize: '13px'
+                    }}>Copiez cette offre et envoyez-la à la personne qui doit recevoir votre fichier:</p>
+
+                    <div style={{
+                        borderRadius: '0px',
+                        padding: '16px',
+                        marginBottom: '16px',
+                        overflow: 'hidden'
+                    }}>
+                        <textarea
+                            value={offer}
+                            readOnly
+                            style={{
+                                width: '100%',
+                                height: '120px',
+                                fontFamily: 'monospace',
+                                fontSize: '12px',
+                                border: `1px solid ${greenMi}`,
+                                borderRadius: '0px',
+                                backgroundColor: 'transparent',
+                                resize: 'none',
+                                boxSizing: 'border-box',
+                                overflow: 'hidden',
+                                color: greenMi
+                            }}
+                        />
+                    </div>
+
+                    <div style={{
+                        display: 'flex',
+                        gap: '12px'
+                    }}>
+                        <button
+                            onClick={() => copyToClipboard(offer)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                backgroundColor: blackMi,
+                                color: greenMi,
+                                padding: '8px 16px',
+                                border: `1px solid ${greenMi}`,
+                                borderRadius: '0px',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s',
+                                fontSize: '14px'
+                            }}
+                        >
+                            {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
+                            <span>{copied ? 'Copié !' : 'Copier l\'offre'}</span>
+                        </button>
+
+                        <button
+                            onClick={resetConnection}
+                            style={{
+                                color: greenMi,
+                                backgroundColor: 'transparent',
+                                border: `1px solid ${greenMi}`,
+                                borderRadius: '0px',
+                                padding: '8px 16px',
+                                cursor: 'pointer',
+                                fontSize: '14px'
+                            }}
+                        >
+                            Annuler
+                        </button>
+                    </div>
+
+                    <div style={{
+                        marginTop: '24px',
+                        padding: '16px',
+                        backgroundColor: blackMi,
+                        borderRadius: '0px',
+                    }}>
+                        <h4 style={{
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            color: greenMi,
+                            marginBottom: '8px'
+                        }}>En attente de la réponse...</h4>
+                        <p style={{
+                            fontSize: '14px',
+                            color: greenMi,
+                            margin: '0'
+                        }}>Collez la clé KiKi de votre amis</p>
+
+                        <div style={{
+                            marginTop: '12px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px'
+                        }}>
+                            <textarea
+                                placeholder="Collez la réponse WebRTC ici..."
+                                value={remoteId}
+                                onChange={(e) => setRemoteId(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    height: '80px',
+                                    padding: '8px',
+                                    border: `1px solid ${greenMi}`,
+                                    borderRadius: '0x',
+                                    color: greenMi,
+                                    fontFamily: 'monospace',
+                                    fontSize: '12px',
+                                    resize: 'vertical',
+                                    boxSizing: 'border-box',
+                                    backgroundColor: blackMi,
+                                    overflow: 'hidden',
+                                    resize: 'none'
+                                }}
+                            />
+                            <button
+                                onClick={() => handleAnswer(remoteId)}
+                                disabled={!remoteId.trim()}
+                                style={{
+                                    backgroundColor: blackMi,
+                                    color: greenMi,
+                                    padding: '6px 12px',
+                                    border: `1px solid ${greenMi}`,
+                                    borderRadius: '0px',
+                                    cursor: remoteId.trim() ? 'pointer' : 'not-allowed',
+                                    fontSize: '12px'
+                                }}
+                            >
+                                Traiter la réponse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showOfferAnswer && answer && !isHost && (
+                <div style={{
+                    borderRadius: '16px',
+                    padding: '32px',
+                    marginBottom: '24px'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '16px'
+                    }}>
+                        <Check style={{
+                            width: '20px',
+                            height: '20px',
+                            color: greenMi,
+                            marginRight: '8px'
+                        }} />
+                        <h3 style={{
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: greenMi
+                        }}>Étape 2: Renvoyez cette réponse</h3>
+                    </div>
+
+                    <p style={{
+                        color: greenMi,
+                        marginBottom: '16px'
+                    }}>Copie t'as clé KiKi et envoie la a ton copain de KiKi</p>
+
+                    <div style={{
+                        backgroundColor: blackMi,
+                        height: 'auto',
+                        borderRadius: '0px',
+                    }}>
+                        <textarea
+                            value={answer}
+                            readOnly
+                            style={{
+                                color: greenMi,
+                                width: '100%',
+                                height: 'auto',
+                                fontFamily: 'monospace',
+                                fontSize: '12px',
+                                border: `1px solid ${greenMi}`,
+                                backgroundColor: 'transparent',
+                                resize: 'none',
+                                boxSizing: 'border-box',
+                                overflow: 'hidden'
+                            }}
+                        />
+                    </div>
+
+                    <button
+                        onClick={() => copyToClipboard(answer)}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            backgroundColor: blackMi,
+                            color: greenMi,
+                            padding: '8px 16px',
+                            border: `1px solid ${greenMi}`,
+                            borderRadius: '0px',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s',
+                            fontSize: '14px'
+                        }}
+                    >
+                        {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
+                        <span>{copied ? 'Copié !' : 'Copier la réponse'}</span>
+                    </button>
+                </div>
+            )}
+
+            {isConnected && dataChannelReady && (
+                <div style={{
+                    backgroundColor: blackMi,
+                    borderRadius: '16px',
+                    padding: '32px',
+                    marginBottom: '24px'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '24px'
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px'
+                        }}>
+                            <div style={{
+                                width: '12px',
+                                height: '12px',
+                                backgroundColor: blackMi,
+                                borderRadius: '50%',
+                                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                            }}></div>
+                            <span style={{
+                                fontSize: '18px',
+                                fontWeight: '600',
+                                color: greenMi
+                            }}>Connexion KiKi établie...</span>
+                            <Wifi style={{
+                                width: '20px',
+                                height: '20px',
+                                color: greenMi
+                            }} />
+                        </div>
+                        <button
+                            onClick={resetConnection}
+                            style={{
+                                color: greenMi,
+                                backgroundColor: 'transparent',
+                                border: `1px solid ${greenMi}`,
+                                cursor: 'pointer',
+                                fontSize: '14px'
+                            }}
+                        >
+                            Déconnecter
+                        </button>
+                    </div>
+
+                    {isHost && (
+                        <div style={{ marginBottom: '32px' }}>
+                            <h3 style={{
+                                fontSize: '18px',
+                                fontWeight: '600',
+                                marginBottom: '16px',
+                                color: greenMi
+                            }}>Envoyer un fichier</h3>
+
+                            <input
+                                ref={fileInput}
+                                type="file"
+                                onChange={(e) => setFile(e.target.files[0])}
+                                style={{ display: 'none' }}
+                            />
+
+                            {!file ? (
+                                <button
+                                    onClick={() => fileInput.current?.click()}
+                                    style={{
+                                        width: '100%',
+                                        padding: '32px',
+                                        border: `2px dashed ${greenMi}`,
+                                        backgroundColor: blackMi,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    <Upload style={{
+                                        width: '48px',
+                                        height: '48px',
+                                        color: greenMi,
+                                        margin: '0 auto 16px auto',
+                                        display: 'block'
+                                    }} />
+                                    <span style={{
+                                        color: greenMi,
+                                        fontWeight: '600'
+                                    }}>Cliquez pour sélectionner un fichier</span>
+                                </button>
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    <div style={{
+                                        backgroundColor: blackMi,
+                                        borderRadius: '0px',
+                                        padding: '16px'
+                                    }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between'
+                                        }}>
+                                            <div>
+                                                <p style={{
+                                                    fontWeight: '600',
+                                                    color: greenMi,
+                                                    margin: '0 0 4px 0'
+                                                }}>{file.name}</p>
+                                                <p style={{
+                                                    fontSize: '14px',
+                                                    color: greenMi,
+                                                    margin: '0'
+                                                }}>{formatFileSize(file.size)}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setFile(null)}
+                                                style={{
+                                                    color: greenMi,
+                                                    backgroundColor: 'transparent',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    fontSize: '20px',
+                                                    lineHeight: '1'
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {isTransferring && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                fontSize: '14px'
+                                            }}>
+                                                <span>Envoi en cours...</span>
+                                                <span>{Math.round(transferProgress)}%</span>
+                                            </div>
+                                            <div style={{
+                                                width: '100%',
+                                                backgroundColor: blackMi,
+                                                borderRadius: '9999px',
+                                                height: '8px'
+                                            }}>
+                                                <div
+                                                    style={{
+                                                        backgroundColor: blackMi,
+                                                        height: '8px',
+                                                        borderRadius: '9999px',
+                                                        transition: 'width 0.3s ease',
+                                                        width: `${transferProgress}%`
+                                                    }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={sendFile}
+                                        disabled={isTransferring}
+                                        style={{
+                                            width: '100%',
+                                            backgroundColor: blackMi,
+                                            color: greenMi,
+                                            padding: '12px 24px',
+                                            border: `1px solid ${greenMi}`,
+                                            borderRadius: '0px',
+                                            cursor: isTransferring ? 'not-allowed' : 'pointer',
+                                            transition: 'background-color 0.2s',
+                                            fontWeight: '600',
+                                            fontSize: '16px'
+                                        }}
+                                    >
+                                        {isTransferring ? 'Envoi en cours...' : 'Envoyer le fichier'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {(receivedFile || (!isHost && isConnected)) && (
+                        <div>
+                            {!receivedFile && (
+                                <div style={{ marginBottom: '32px' }}>
+                                    <h3 style={{
+                                        fontSize: '18px',
+                                        fontWeight: '600',
+                                        marginBottom: '16px',
+                                        color: greenMi
+                                    }}>En attente d'un fichier...</h3>
+                                    <div style={{
+                                        padding: '24px',
+                                        border: `2px dashed ${greenMi}`,
+                                        textAlign: 'center',
+                                        backgroundColor: blackMi
+                                    }}>
+                                        <p style={{
+                                            color: greenMi,
+                                            margin: '0'
+                                        }}>Prêt à recevoir des fichiers</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {receivedFile && (
+                                <div style={{
+                                    backgroundColor: blackMi,
+                                    borderRadius: '0px',
+                                    padding: '24px'
+                                }}>
+                                    <h3 style={{
+                                        fontSize: '18px',
+                                        fontWeight: '600',
+                                        marginBottom: '16px',
+                                        color: greenMi,
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}>
+                                        <Check style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            color: greenMi,
+                                            marginRight: '8px'
+                                        }} />
+                                        Fichier reçu avec succès !
+                                    </h3>
+
+                                    <div style={{
+                                        backgroundColor: blackMi,
+                                        borderRadius: '0px',
+                                        padding: '16px',
+                                        marginBottom: '16px'
+                                    }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between'
+                                        }}>
+                                            <div>
+                                                <p style={{
+                                                    fontWeight: '600',
+                                                    color: greenMi,
+                                                    margin: '0 0 4px 0'
+                                                }}>{receivedFile.name}</p>
+                                                <p style={{
+                                                    fontSize: '14px',
+                                                    color: greenMi,
+                                                    margin: '0'
+                                                }}>{formatFileSize(receivedFile.size)}</p>
+                                            </div>
+                                            <Download style={{
+                                                width: '24px',
+                                                height: '24px',
+                                                color: greenMi
+                                            }} />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={downloadFile}
+                                        style={{
+                                            width: '100%',
+                                            backgroundColor: blackMi,
+                                            color: greenMi,
+                                            padding: '12px 24px',
+                                            border: `1px solid ${greenMi}`,
+                                            borderRadius: '0px',
+                                            cursor: 'pointer',
+                                            transition: 'background-color 0.2s',
+                                            fontWeight: '600',
+                                            fontSize: '16px'
+                                        }}
+                                    >
+                                        Télécharger le fichier
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {isTransferring && !isHost && (
+                        <div style={{
+                            backgroundColor: blackMi,
+                            borderRadius: '0px',
+                            padding: '24px'
+                        }}>
+                            <h3 style={{
+                                fontSize: '18px',
+                                fontWeight: '600',
+                                marginBottom: '16px',
+                                color: greenMi
+                            }}>Réception en cours...</h3>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontSize: '14px',
+                                    color: greenMi
+                                }}>
+                                    <span>Téléchargement...</span>
+                                    <span>{Math.round(transferProgress)}%</span>
+                                </div>
+                                <div style={{
+                                    width: '100%',
+                                    borderRadius: '9999px',
+                                    height: '8px',
+                                    border: `1px solid ${greenMi}`
+                                }}>
+                                    <div
+                                        style={{
+                                            backgroundColor: greenMi,
+                                            height: '8px',
+                                            borderRadius: '9999px',
+                                            transition: 'width 0.3s ease',
+                                            width: `${transferProgress}%`
+                                        }}
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {connectionStatus === 'connecting' && (
+                <div style={{
+                    backgroundColor: blackMi,
+                    borderRadius: '16px',
+                    padding: '32px',
+                    marginBottom: '24px',
+                    textAlign: 'center'
+                }}>
+                    <h3 style={{
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: greenMi,
+                        marginBottom: '8px'
+                    }}>Établissement de la connexion P2P...</h3>
+                    <p style={{
+                        color: greenMi,
+                        fontSize: '14px'
+                    }}>Veuillez patienter pendant que les pairs se connectent</p>
+                </div>
+            )}
+
+            <div style={{
+                textAlign: 'center',
+                color: greenMi,
+                opacity: '0.8'
+            }}>
+            </div>
+            <style jsx>{`
+        input::placeholder {
+            font-weight: bold;
+            opacity: 0.5;
+            color: ${greenMi};
+        }
+
+        textarea::placeholder {
+            font-weight: bold;
+            opacity: 0.5;
+            color: ${greenMi};
+        }
+      `}</style>
         </div>
     );
-}
+};
 
-
-export default Competence;
+export default P2PFileTransfer;
