@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Upload, Download, Copy, Check, Wifi, AlertCircle } from 'lucide-react';
+import { encryptCommeUnCoquin, decryptCommeUnManCool } from '../tools/cryptage';
 import "./Competence.css"
 
 const P2PFileTransfer = () => {
@@ -24,7 +25,6 @@ const P2PFileTransfer = () => {
     const blackMi = "black";
     const greenMi = "yellowgreen"
 
-    // Configuration ICE servers (STUN)
     const iceConfiguration = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
@@ -33,12 +33,10 @@ const P2PFileTransfer = () => {
         ]
     };
 
-    // Initialiser la connexion WebRTC
     const initializePeerConnection = () => {
         peerConnection.current = new RTCPeerConnection(iceConfiguration);
 
         peerConnection.current.onicecandidate = (event) => {
-            // Les candidats ICE seront inclus dans l'offre/réponse
             if (event.candidate === null) {
                 console.log('ICE gathering complete');
             }
@@ -56,15 +54,12 @@ const P2PFileTransfer = () => {
             dataChannel.current = event.channel;
             setupDataChannel();
 
-            // S'assurer que le canal est prêt
             if (event.channel.readyState === 'open') {
                 console.log('Data channel already open');
                 setDataChannelReady(true);
             }
         };
     };
-
-    // Configuration du canal de données
     const setupDataChannel = () => {
         if (!dataChannel.current) return;
 
@@ -109,7 +104,6 @@ const P2PFileTransfer = () => {
             }
         };
 
-        // Test de connexion
         if (dataChannel.current.readyState === 'open') {
             console.log('Data channel is already open, sending test message');
             try {
@@ -120,14 +114,11 @@ const P2PFileTransfer = () => {
         }
     };
 
-    // Variables pour la réception de fichiers
     const receivedChunks = useRef([]);
     const expectedChunks = useRef(0);
     const fileInfo = useRef(null);
 
-    // Gérer les chunks de fichier reçus
     const handleFileChunk = (data) => {
-        // Convertir le base64 en blob
         const binaryString = atob(data.chunk.split(',')[1]);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
@@ -139,9 +130,7 @@ const P2PFileTransfer = () => {
         setTransferProgress(progress);
     };
 
-    // Compléter la réception du fichier
     const completeFileReceive = (data) => {
-        // Assembler tous les chunks
         const totalSize = receivedChunks.current.reduce((sum, chunk) => sum + (chunk ? chunk.length : 0), 0);
         const fullFile = new Uint8Array(totalSize);
         let offset = 0;
@@ -164,7 +153,6 @@ const P2PFileTransfer = () => {
         setIsTransferring(false);
         setTransferProgress(100);
 
-        // Réinitialiser les variables
         receivedChunks.current = [];
         expectedChunks.current = 0;
         fileInfo.current = null;
@@ -172,12 +160,10 @@ const P2PFileTransfer = () => {
         console.log('File reconstruction complete:', data.name);
     };
 
-    // Créer une offre (Host)
     const createOffer = async () => {
         setIsHost(true);
         initializePeerConnection();
 
-        // Créer le canal de données
         dataChannel.current = peerConnection.current.createDataChannel('fileTransfer', {
             ordered: true
         });
@@ -187,7 +173,6 @@ const P2PFileTransfer = () => {
             const offer = await peerConnection.current.createOffer();
             await peerConnection.current.setLocalDescription(offer);
 
-            // Attendre que tous les candidats ICE soient collectés
             await new Promise((resolve) => {
                 if (peerConnection.current.iceGatheringState === 'complete') {
                     resolve();
@@ -200,7 +185,7 @@ const P2PFileTransfer = () => {
                 }
             });
 
-            setOffer(JSON.stringify(peerConnection.current.localDescription));
+            setOffer(( await encryptCommeUnCoquin(JSON.stringify(peerConnection.current.localDescription)) ));
             setShowOfferAnswer(true);
 
         } catch (error) {
@@ -208,18 +193,16 @@ const P2PFileTransfer = () => {
         }
     };
 
-    // Traiter l'offre et créer une réponse (Client)
     const handleOffer = async (offerString) => {
         try {
             initializePeerConnection();
 
-            const offerDesc = JSON.parse(offerString);
+            const offerDesc = JSON.parse(await decryptCommeUnManCool(offerString));
             await peerConnection.current.setRemoteDescription(offerDesc);
 
             const answer = await peerConnection.current.createAnswer();
             await peerConnection.current.setLocalDescription(answer);
 
-            // Attendre que tous les candidats ICE soient collectés
             await new Promise((resolve) => {
                 if (peerConnection.current.iceGatheringState === 'complete') {
                     resolve();
@@ -227,7 +210,7 @@ const P2PFileTransfer = () => {
                     const timeout = setTimeout(() => {
                         console.log('ICE gathering timeout, proceeding anyway');
                         resolve();
-                    }, 10000); // Timeout après 10 secondes
+                    }, 10000);
 
                     peerConnection.current.addEventListener('icegatheringstatechange', () => {
                         if (peerConnection.current.iceGatheringState === 'complete') {
@@ -238,7 +221,7 @@ const P2PFileTransfer = () => {
                 }
             });
 
-            setAnswer(JSON.stringify(peerConnection.current.localDescription));
+            setAnswer(await encryptCommeUnCoquin(JSON.stringify(peerConnection.current.localDescription)));
             setShowOfferAnswer(true);
 
         } catch (error) {
@@ -247,10 +230,9 @@ const P2PFileTransfer = () => {
         }
     };
 
-    // Traiter la réponse (Host)
     const handleAnswer = async (answerString) => {
         try {
-            const answerDesc = JSON.parse(answerString);
+            const answerDesc = JSON.parse(await decryptCommeUnManCool(answerString));
             await peerConnection.current.setRemoteDescription(answerDesc);
             console.log('Answer processed successfully');
         } catch (error) {
@@ -259,7 +241,6 @@ const P2PFileTransfer = () => {
         }
     };
 
-    // Envoyer un fichier
     const sendFile = async () => {
         if (!file || !dataChannel.current) {
             alert('8======D');
@@ -276,25 +257,22 @@ const P2PFileTransfer = () => {
         setTransferProgress(0);
 
         try {
-            const chunkSize = 16384; // 16KB chunks
+            const chunkSize = 16384; // 16KB chunk
             const chunks = Math.ceil(file.size / chunkSize);
 
-            // Envoyer les infos du fichier
             const fileInfo = {
                 type: 'file-info',
                 name: file.name,
                 size: file.size,
-                fileType: file.type, // Renommé pour éviter la confusion
+                fileType: file.type,
                 chunks: chunks
             };
 
             console.log('Sending file info:', fileInfo);
             dataChannel.current.send(JSON.stringify(fileInfo));
 
-            // Petite pause pour s'assurer que l'info est reçue
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            // Envoyer les chunks
             const reader = new FileReader();
 
             for (let i = 0; i < chunks; i++) {
@@ -324,18 +302,16 @@ const P2PFileTransfer = () => {
                     reader.readAsDataURL(chunk);
                 });
 
-                // Pause pour éviter la surcharge
                 if (i % 5 === 0) {
                     await new Promise(resolve => setTimeout(resolve, 50));
                 }
             }
 
-            // Signaler la fin
             const completeData = {
                 type: 'file-complete',
                 name: file.name,
                 size: file.size,
-                fileType: file.type // Renommé pour éviter la confusion
+                fileType: file.type
             };
 
             console.log('Sending completion signal');
@@ -350,7 +326,6 @@ const P2PFileTransfer = () => {
         }
     };
 
-    // Copier dans le presse-papiers
     const copyToClipboard = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -361,7 +336,6 @@ const P2PFileTransfer = () => {
         }
     };
 
-    // Télécharger le fichier reçu
     const downloadFile = () => {
         if (receivedFile) {
             const a = document.createElement('a');
@@ -373,7 +347,6 @@ const P2PFileTransfer = () => {
         }
     };
 
-    // Réinitialiser
     const resetConnection = () => {
         if (peerConnection.current) {
             peerConnection.current.close();
@@ -403,7 +376,6 @@ const P2PFileTransfer = () => {
 
     return (
         <div style={{
-            minHeight: '100vh',
             backgroundColor: blackMi,
             padding: '16px'
         }}>
@@ -517,11 +489,10 @@ const P2PFileTransfer = () => {
                         color: greenMi,
                         marginBottom: '12px',
                         fontSize: '13px'
-                    }}>Copiez cette offre et envoyez-la à la personne qui doit recevoir votre fichier:</p>
+                    }}>copier cette KiKi key et tu la passe a ton copain de KiKi:</p>
 
                     <div style={{
                         borderRadius: '0px',
-                        padding: '16px',
                         marginBottom: '16px',
                         overflow: 'hidden'
                     }}>
@@ -565,7 +536,7 @@ const P2PFileTransfer = () => {
                             }}
                         >
                             {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
-                            <span>{copied ? 'Copié !' : 'Copier l\'offre'}</span>
+                            <span>{copied ? 'Copié !' : 'Copier la KiKi key'}</span>
                         </button>
 
                         <button
@@ -640,7 +611,7 @@ const P2PFileTransfer = () => {
                                     fontSize: '12px'
                                 }}
                             >
-                                Traiter la réponse
+                                faire un KiKi check
                             </button>
                         </div>
                     </div>
@@ -650,7 +621,6 @@ const P2PFileTransfer = () => {
             {showOfferAnswer && answer && !isHost && (
                 <div style={{
                     borderRadius: '16px',
-                    padding: '32px',
                     marginBottom: '24px'
                 }}>
                     <div style={{
@@ -668,7 +638,7 @@ const P2PFileTransfer = () => {
                             fontSize: '12px',
                             fontWeight: '600',
                             color: greenMi
-                        }}>Étape 2: Renvoyez cette réponse</h3>
+                        }}>Étape 2: Renvoyez cette KiKi key</h3>
                     </div>
 
                     <p style={{
@@ -716,7 +686,7 @@ const P2PFileTransfer = () => {
                         }}
                     >
                         {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
-                        <span>{copied ? 'Copié !' : 'Copier la réponse'}</span>
+                        <span>{copied ? 'Copié !' : 'Copier ta KiKi key'}</span>
                     </button>
                 </div>
             )}
@@ -767,7 +737,7 @@ const P2PFileTransfer = () => {
                                 fontSize: '14px'
                             }}
                         >
-                            Déconnecter
+                            Déconextion
                         </button>
                     </div>
 
