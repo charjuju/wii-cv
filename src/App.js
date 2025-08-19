@@ -1,5 +1,5 @@
 import WiiMenu from './WiiMenu'
-import Competence from './Competence/Competence'
+import P2PFileTransfer from './Competence/P2PFileTransfer'
 import { BrowserRouter, Routes, Route} from "react-router-dom";
 import Gelarie from './Galerie/Galerie'
 import './App.css';
@@ -12,7 +12,7 @@ function App() {
         <div className="container">
           <Routes>
           <Route path="/" element={<WiiMenu />} />
-          <Route path="/Compétence" element={<Competence />} />
+          <Route path="/Compétence" element={<P2PFileTransfer />} />
           <Route path="/Galerie" element={<Gelarie />} />
           <Route path="/*" element={<p>404</p>} />
           </Routes>

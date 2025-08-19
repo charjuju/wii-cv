@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, Download, Copy, Check, Wifi, AlertCircle } from 'lucide-react';
 import { encryptCommeUnCoquin, decryptCommeUnManCool } from '../tools/cryptage';
+import { QRCodeSVG } from 'qrcode.react';
 import "./Competence.css"
 
 const P2PFileTransfer = () => {
@@ -17,6 +18,9 @@ const P2PFileTransfer = () => {
     const [offer, setOffer] = useState('');
     const [answer, setAnswer] = useState('');
     const [showOfferAnswer, setShowOfferAnswer] = useState(false);
+    const [qrcodeStr, setQrcode] = useState("");
+    const [loading, setLoading] = useState(false);
+
 
     const peerConnection = useRef(null);
     const dataChannel = useRef(null);
@@ -39,12 +43,14 @@ const P2PFileTransfer = () => {
         peerConnection.current.onicecandidate = (event) => {
             if (event.candidate === null) {
                 console.log('ICE gathering complete');
+                setLoading(false);
             }
         };
 
         peerConnection.current.onconnectionstatechange = () => {
             const state = peerConnection.current.connectionState;
             console.log('Connection state:', state);
+            setLoading(true);
             setConnectionStatus(state);
             setIsConnected(state === 'connected');
         };
@@ -63,8 +69,8 @@ const P2PFileTransfer = () => {
     const setupDataChannel = () => {
         if (!dataChannel.current) return;
 
-        console.log('Setting up data channel, readyState:', dataChannel.current.readyState);
-
+        console.log('Setting up data channel, readyState:', dataChannel.current.readyState, dataChannel.current);
+        setLoading(true);
         dataChannel.current.onopen = () => {
             console.log('Data channel opened');
             setDataChannelReady(true);
@@ -185,7 +191,7 @@ const P2PFileTransfer = () => {
                 }
             });
 
-            setOffer(( await encryptCommeUnCoquin(JSON.stringify(peerConnection.current.localDescription)) ));
+            setOffer((await encryptCommeUnCoquin(JSON.stringify(peerConnection.current.localDescription))));
             setShowOfferAnswer(true);
 
         } catch (error) {
@@ -379,6 +385,12 @@ const P2PFileTransfer = () => {
             backgroundColor: blackMi,
             padding: '16px'
         }}>
+            {qrcodeStr &&
+                <div style={{ position: 'fixed', top: '0px', left: '0px', width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: blackMi, zIndex: '100', flexDirection: 'column', gap: '16px' }}>
+                    <QRCodeSVG fgColor={greenMi} bgColor={blackMi} value={qrcodeStr} size={300} />
+                    <button style={{ height: "44px", width: '234px', borderRadius: '0px', borderColor: greenMi, backgroundColor: blackMi, color: greenMi }} onClick={() => setQrcode("")}>quit</button>
+                </div>
+            }
             {!showOfferAnswer && (
                 <div style={{ textAlign: 'center', height: '100%' }}>
                     <div style={{
@@ -390,7 +402,7 @@ const P2PFileTransfer = () => {
                         height: '100%'
                     }}>
                         <button
-                            onClick={() => createOffer()}
+                            onClick={() => !loading ? createOffer() : console.log("ça charge troup de bal")}
                             style={{ height: "44px", width: '234px', borderRadius: '0px', borderColor: greenMi, backgroundColor: blackMi, color: greenMi }}
                             onMouseEnter={(e) => {
                                 e.target.style.backgroundColor = greenMi;
@@ -401,7 +413,7 @@ const P2PFileTransfer = () => {
                                 e.target.style.color = greenMi;
                             }}
                         >
-                            ENVOYER SON KiKi
+                            {!loading ? "ENVOYER SON KiKi" : "CHARGEMENT DU KIKI"}
                         </button>
                         <div style={{
                             border: `2px solid ${greenMi}`,
@@ -553,6 +565,20 @@ const P2PFileTransfer = () => {
                         >
                             Annuler
                         </button>
+                        <button
+                            onClick={() => setQrcode(offer)}
+                            style={{
+                                color: greenMi,
+                                backgroundColor: 'transparent',
+                                border: `1px solid ${greenMi}`,
+                                borderRadius: '0px',
+                                padding: '8px 16px',
+                                cursor: 'pointer',
+                                fontSize: '14px'
+                            }}
+                        >
+                            qrcode
+                        </button>
                     </div>
 
                     <div style={{
@@ -669,25 +695,41 @@ const P2PFileTransfer = () => {
                         />
                     </div>
 
-                    <button
-                        onClick={() => copyToClipboard(answer)}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            backgroundColor: blackMi,
-                            color: greenMi,
-                            padding: '8px 16px',
-                            border: `1px solid ${greenMi}`,
-                            borderRadius: '0px',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s',
-                            fontSize: '14px'
-                        }}
-                    >
-                        {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
-                        <span>{copied ? 'Copié !' : 'Copier ta KiKi key'}</span>
-                    </button>
+                    <div style={{display: 'flex', gap: '16px'}}>
+                        <button
+                            onClick={() => copyToClipboard(answer)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                backgroundColor: blackMi,
+                                color: greenMi,
+                                padding: '8px 16px',
+                                border: `1px solid ${greenMi}`,
+                                borderRadius: '0px',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s',
+                                fontSize: '14px'
+                            }}
+                        >
+                            {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
+                            <span>{copied ? 'Copié !' : 'Copier ta KiKi key'}</span>
+                        </button>
+                        <button
+                            onClick={() => setQrcode(answer)}
+                            style={{
+                                color: greenMi,
+                                backgroundColor: 'transparent',
+                                border: `1px solid ${greenMi}`,
+                                borderRadius: '0px',
+                                padding: '8px 16px',
+                                cursor: 'pointer',
+                                fontSize: '14px'
+                            }}
+                        >
+                            qrcode
+                        </button>
+                    </div>
                 </div>
             )}
 
